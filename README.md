@@ -102,7 +102,7 @@ Killing discord and relaunching the new version
 
 ## Version Detection
 
-The program detects installed Discord versions by scanning `~/.config/discord` directories for version patterns (e.g., `0.0.123`).
+The program detects installed Discord versions by reading `/usr/share/discord/resources/build_info.json`, which contains the exact version information in JSON format. This method is more reliable and accurate than scanning directory names.
 
 ## Notes
 

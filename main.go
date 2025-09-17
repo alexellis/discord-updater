@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -15,6 +16,11 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 )
+
+type DiscordBuildInfo struct {
+	ReleaseChannel string `json:"releaseChannel"`
+	Version        string `json:"version"`
+}
 
 func main() {
 	home, _ := os.UserHomeDir()
@@ -118,30 +124,22 @@ func install(file string) {
 }
 
 func getInstalledVersion() string {
-	home, _ := os.UserHomeDir()
-	configDir := filepath.Join(home, ".config", "discord")
+	buildInfoPath := "/usr/share/discord/resources/build_info.json"
 
-	files, err := os.ReadDir(configDir)
+	data, err := os.ReadFile(buildInfoPath)
 	if err != nil {
-		log.Printf("Failed to read discord config dir: %v", err)
+		log.Printf("Failed to read Discord build info: %v", err)
 		return ""
 	}
 
-	re := regexp.MustCompile(`(\d+\.\d+\.\d+)`)
-	var latestVersion string
-
-	for _, file := range files {
-		if file.IsDir() {
-			matches := re.FindStringSubmatch(file.Name())
-			if len(matches) > 1 {
-				version := matches[1]
-				if version > latestVersion {
-					latestVersion = version
-				}
-			}
-		}
+	var buildInfo DiscordBuildInfo
+	err = json.Unmarshal(data, &buildInfo)
+	if err != nil {
+		log.Printf("Failed to parse Discord build info JSON: %v", err)
+		return ""
 	}
-	return latestVersion
+
+	return buildInfo.Version
 }
 
 func getLatestDebVersion(downloads string) string {

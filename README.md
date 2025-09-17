@@ -1,6 +1,15 @@
 # Discord Updater
 
-This Go program watches `~/Downloads` for new `discord-*.deb` files, debounces them to ensure they're fully written, installs via `dpkg` (with retry on lock), kills existing Discord processes, and relaunches Discord as the user.
+Discord has [an awful upgrade process](https://x.com/alexellisuk/status/1968230950342652296) on Linux:
+
+1. You open the program and it shows a "Download" button and stops the world. The older version won't even open.
+2. You hit download, but have 10 other older .deb files and can't find the right one, so you have to run `ls -ltras ~/Downloads/discord*.deb`
+3. You find the right one and have to `dpkg -i` it as `sudo`
+4. You have to relaunch Discord
+
+One alternative is to use Flatpak or snap.. I really want to keep that stuff off my system.
+
+This Go program watches `~/Downloads` for new `discord-*.deb` files, debounces them to ensure they're fully written, installs via `dpkg` (with retry on lock), kills existing Discord processes, and relaunches Discord as your user.
 
 ## Setup
 

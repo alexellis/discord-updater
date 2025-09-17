@@ -1,0 +1,10 @@
+[Unit]
+Description=Discord Updater
+
+[Service]
+ExecStart=/home/alex/go/bin/discord-updater
+WorkingDirectory=/home/alex
+Restart=always
+
+[Install]
+WantedBy=default.target

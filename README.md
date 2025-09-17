@@ -1,6 +1,6 @@
 # Discord Updater
 
-This Go program automatically keeps Discord up-to-date by monitoring `~/Downloads` for new `discord-*.deb` files and performing automatic hourly update checks. It debounces files to ensure they're fully written, installs via `dpkg` (with retry on lock), kills existing Discord processes, and relaunches Discord as the user.
+This Go program automatically keeps Discord up-to-date by monitoring `~/Downloads` for new `discord-*.deb` files and performing automatic hourly update checks to Discord's download server. It debounces files to ensure they're fully written to `~/Downloads` before trying to install them. It installs the package via `dpkg` (with retry on `apt` locks), kills existing Discord processes, and relaunches Discord.
 
 ## Why do we need this tool?
 
@@ -13,21 +13,11 @@ Discord has [an awful upgrade process](https://x.com/alexellisuk/status/19682309
 
 One alternative is to use Flatpak or snap.. I really want to keep that stuff off my system. This program automates the entire process for you and it's open source, so you can hack on it as much as you like, or adapt it to update other similar packages.
 
-## Features
-
-- **Automatic Update Checking**: Checks Discord's download URL every hour for new versions
-- **Startup Version Display**: Shows current installed Discord version on startup
-- **Initial Update Check**: Performs an immediate update check when the program starts
-- **Smart Version Comparison**: Only downloads updates if they're newer than both installed version and existing downloads
-- **File Monitoring**: Watches `~/Downloads` for manually downloaded .deb files
-- **Automatic Installation**: Installs new versions and relaunches Discord automatically
-- **Debounce Protection**: Waits for files to be fully written before processing
-
 ## How It Works
 
 1. **On Startup**:
    - Displays current installed Discord version
-   - Performs immediate update check
+   - Checks Discord's download URL for a newer version and fetches it if different
    - Starts monitoring `~/Downloads`
 
 2. **Hourly Checks**:
@@ -104,10 +94,7 @@ Killing discord and relaunching the new version
 
 The program detects installed Discord versions by reading `/usr/share/discord/resources/build_info.json`, which contains the exact version information in JSON format. This method is more reliable and accurate than scanning directory names.
 
-## Notes
+# License
 
-- The service runs as your user and monitors your Downloads folder
-- If multiple deb files are present, it will install the latest detected one after debounce
-- Automatic downloads are saved to `~/Downloads` where they're automatically detected and installed
-- The program handles dpkg lock conflicts with retry logic
-- All operations are logged for monitoring and debugging
+[MIT](LICENSE.md] - no warranty of any kind. Use and adapt at your own risk.
+

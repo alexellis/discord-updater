@@ -19,23 +19,6 @@ Discord has [an awful upgrade process](https://x.com/alexellisuk/status/19682309
 
 One alternative is to use Flatpak or snap.. I really want to keep that stuff off my system. This program automates the entire process for you and it's open source, so you can hack on it as much as you like, or adapt it to update other similar packages.
 
-## How It Works
-
-1. **On Startup**:
-   - Displays current installed Discord version
-   - Checks Discord's download URL for a newer version and fetches it if different
-   - Starts monitoring `~/Downloads`
-
-2. **Hourly Checks**:
-   - Fetches latest version from Discord's download URL (without following redirects)
-   - Compares with installed version and latest downloaded .deb
-   - Downloads new version if different to `~/Downloads`, which triggers the file detection
-
-3. **File Detection**:
-   - Monitors `~/Downloads` for new `discord-*.deb` files
-   - Debounces files for 2 seconds to ensure complete downloads
-   - Automatically installs and relaunches Discord
-
 ## Setup
 
 1. Build the program:

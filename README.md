@@ -6,8 +6,6 @@ This Go program automatically keeps Discord up-to-date with two modes:
 
 **2. Discord command wrapper**: Acts as a Discord wrapper that checks for updates on startup then launches Discord (run as an alias named `discordup` or with `--launch` flag). No need for a background service, but a bit more manual to install/consume updates.
 
-## Features
-
 ## Why do we need this tool?
 
 Discord has [an awful upgrade process](https://x.com/alexellisuk/status/1968230950342652296) on Linux:
@@ -19,7 +17,7 @@ Discord has [an awful upgrade process](https://x.com/alexellisuk/status/19682309
 
 One alternative is to use Flatpak or snap.. I really want to keep that stuff off my system. This program automates the entire process for you and it's open source, so you can hack on it as much as you like, or adapt it to update other similar packages.
 
-## Setup
+## Setup as a daemon (background checking)
 
 1. Build the program:
    ```
@@ -51,7 +49,7 @@ If your user does not have passwordless `sudo`, then you'll need it for `dpkg` t
 echo "$(whoami) ALL=(ALL) NOPASSWD: /usr/bin/dpkg" | sudo tee -a /etc/sudoers
 ```
 
-## Setup for the manual mode
+## Setup for the wrapper mode
 
 1. Build the program:
    ```
@@ -60,37 +58,18 @@ echo "$(whoami) ALL=(ALL) NOPASSWD: /usr/bin/dpkg" | sudo tee -a /etc/sudoers
 
    If you don't have Go, `sudo -E arkade system install go` is a quick way to get it via [arkade](https://arkade.dev).
 
-2. Optionally, create a symlink or alias named `discordup` to the built binary for launcher mode:
+2. Option A) create a symlink or alias named `discordup` to the built binary for launcher mode:
    ```
    ln -s $(which discord-updater) ~/bin/discordup
    ```
 
-3. Or just use the `--launch` flag when running the binary:
+3. Option B) just use the `--launch` flag when running the binary:
 
    ```
    discord-updater --launch
    ```
 
-## Usage
-
-### Daemon Mode (Background Service)
-
-```bash
-./discord-updater
-```
-
-### Launcher Mode (One-time Update Check + Launch)
-
-```bash
-# Option 1: Rename/symlink to discordup
-ln -s ./discord-updater discordup
-./discordup
-
-# Option 2: Use --launch flag
-./discord-updater --launch
-```
-
-### Check Logs
+## Check Logs
 ```bash
 journalctl --user -u discord-updater -f
 ```

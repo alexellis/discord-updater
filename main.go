@@ -23,12 +23,12 @@ type DiscordBuildInfo struct {
 func main() {
 	// Check if running in launcher mode (discordup)
 	isLauncherMode := strings.Contains(os.Args[0], "discordup") || len(os.Args) > 1 && os.Args[1] == "--launch"
-	
+
 	if isLauncherMode {
 		runLauncherMode()
 		return
 	}
-	
+
 	// Daemon mode (original functionality)
 	runDaemonMode()
 }
@@ -165,13 +165,13 @@ func downloadDeb(downloadUrl, downloads string) error {
 	return err
 }
 
-func checkForUpdates(downloads string) {
+func checkForUpdates(downloads string) string {
 	log.Printf("Checking for Discord updates...")
 
 	onlineVersion, downloadUrl := getLatestOnlineVersion()
 	if onlineVersion == "" {
 		log.Printf("Failed to get online version")
-		return
+		return ""
 	}
 
 	installedVersion := getInstalledVersion()
@@ -179,13 +179,30 @@ func checkForUpdates(downloads string) {
 
 	log.Printf("Online version: %s, Installed: %s, Latest deb: %s", onlineVersion, installedVersion, latestDebVersion)
 
-	if onlineVersion != installedVersion && onlineVersion != latestDebVersion {
+	if onlineVersion != installedVersion {
 		log.Printf("New version available: %s", onlineVersion)
-		err := downloadDeb(downloadUrl, downloads)
-		if err != nil {
-			log.Printf("Failed to download update: %v", err)
+
+		// Check if we already have the correct .deb file
+		if onlineVersion == latestDebVersion {
+			// We have the file, return its name
+			u, err := url.Parse(downloadUrl)
+			if err == nil {
+				return filepath.Base(u.Path)
+			}
 		} else {
-			log.Printf("Downloaded Discord %s to %s", onlineVersion, downloads)
+			// Download the file
+			err := downloadDeb(downloadUrl, downloads)
+			if err != nil {
+				log.Printf("Failed to download update: %v", err)
+			} else {
+				log.Printf("Downloaded Discord %s to %s", onlineVersion, downloads)
+				// Return the filename of the downloaded file
+				u, err := url.Parse(downloadUrl)
+				if err == nil {
+					return filepath.Base(u.Path)
+				}
+			}
 		}
 	}
+	return ""
 }

@@ -27,7 +27,15 @@ func runDaemonMode() {
 
 	// Check for updates on startup
 	log.Printf("Performing initial update check...")
-	checkForUpdates(downloads)
+	downloadedFile := checkForUpdates(downloads)
+
+	// Install any file that was downloaded during initial check
+	if downloadedFile != "" {
+		fullPath := filepath.Join(downloads, downloadedFile)
+		log.Printf("Installing discord via: %s", downloadedFile)
+		install(fullPath)
+		relaunchDiscord()
+	}
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {

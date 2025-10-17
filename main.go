@@ -13,6 +13,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/alexellis/discord-updater/pkg"
 )
 
 type DiscordBuildInfo struct {
@@ -112,14 +114,23 @@ func getLatestOnlineVersion() (string, string) {
 		},
 	}
 
-	resp, err := client.Get("https://discord.com/api/download?platform=linux")
+	req, err := http.NewRequest("GET", "https://discord.com/api/download?platform=linux", nil)
+	if err != nil {
+		log.Printf("Failed to create request: %v", err)
+		return "", ""
+	}
+	req.Header.Set("User-Agent", pkg.UserAgent())
+
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Failed to fetch Discord download URL: %v", err)
 		return "", ""
 	}
-	defer resp.Body.Close()
+	if resp.Body != nil {
+		defer resp.Body.Close()
+	}
 
-	if resp.StatusCode == 302 {
+	if resp.StatusCode == http.StatusFound {
 		location := resp.Header.Get("Location")
 		if location != "" {
 			u, err := url.Parse(location)
@@ -138,14 +149,23 @@ func getLatestOnlineVersion() (string, string) {
 }
 
 func downloadDeb(downloadUrl, downloads string) error {
-	resp, err := http.Get(downloadUrl)
+	req, err := http.NewRequest("GET", downloadUrl, nil)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	req.Header.Set("User-Agent", pkg.UserAgent())
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("bad status: %s", resp.Status)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if resp.Body != nil {
+		defer resp.Body.Close()
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("bad status: %s, body: %s", resp.Status, string(body))
 	}
 
 	u, err := url.Parse(downloadUrl)

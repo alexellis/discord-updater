@@ -1,4 +1,4 @@
-module discord-updater
+module github.com/alexellis/discord-updater
 
 go 1.25.1
 

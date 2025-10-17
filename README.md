@@ -19,7 +19,19 @@ One alternative is to use Flatpak or snap.. I really want to keep that stuff off
 
 ## Setup as a daemon (background checking)
 
-1. Build the program:
+1. Get or build the program:
+
+   ```
+   # Arkade can be installed without sudo if you are worried.
+   # it's only used to move arkade to /usr/local/bin/
+   curl -SLs https://get.arkade.dev | sudo sh
+   arkade get discord-update
+   mkdir -p ~/go/bin/
+   cp ~/.arkade/bin/discord-updater ~/go/bin/
+   ```
+
+   Or build from source:
+
    ```
    go install
    ```
